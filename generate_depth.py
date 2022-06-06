@@ -14,6 +14,7 @@ from utils.depth_utils import disp_to_depth
 from torchsummary import summary
 
 from PIL import Image
+from matplotlib import pyplot as plt
 
 cv2.setNumThreads(0)
 
@@ -43,19 +44,21 @@ def generate(opt, save):
         models['depth'] = depth_decoder
 
         img = cv2.imread(opt.data_path)
+        img = cv2.resize(img, (1248, 384))
+        print(img.shape)
         img = img.reshape(-1, img.shape[0], img.shape[1], img.shape[2],)
         img = np.rollaxis(img, 3, 1)
         img = torch.tensor(img)
-        print(img.shape)
+        print("Input image shape : {}".format(img.shape))
         features = models['encoder'](img)
-        print(features[0].shape, features[1].shape, features[2].shape, features[3].shape, features[4].shape)
+        print("Encoder Output Dims : {}, {}, {}, {}, {}".format(features[0].shape, features[1].shape, features[2].shape, features[3].shape, features[4].shape))
         if not opt.no_cma:
             output, _ = models['depth'](features)
         else:
             output = models["depth"](features)
         pred_disp = output[("disp", 0)]
         pred_disp, _ = disp_to_depth(pred_disp, opt.min_depth, opt.max_depth)
-        pred_disp = pred_disp.cpu()[:, 0].numpy()
+        pred_disp = pred_disp.cpu()[:, 0].detach().numpy()
         '''
         print("**************************")
         print(models['encoder'](img))
@@ -64,6 +67,9 @@ def generate(opt, save):
         print("**************************")
         '''
         print(pred_disp.shape)
+
+        plt.imshow(pred_disp[0], interpolation='nearest')
+        plt.show()
 
 
 if __name__=='__main__':

@@ -79,7 +79,6 @@ class ResnetEncoder(nn.Module):
             num_layers = min(50, num_layers)
             self.encoder = resnet_multiimage_input(num_layers, pretrained, num_input_images)
         else:
-
             self.encoder = resnets[num_layers](pretrained)
 
         if num_layers > 34:

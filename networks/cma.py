@@ -58,7 +58,7 @@ class CMA(nn.Module):
             if i > 0:
                 x_d += [input_features[i - 1]]
                 x_s += [input_features[i - 1]]
-
+                
             x_d = torch.cat(x_d, 1)
             x_s = torch.cat(x_s, 1)
 
